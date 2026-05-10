@@ -1,0 +1,13 @@
+{
+  "img_size": 256,
+  "marker_radius": 3,
+  "grid_spacing": 16,
+  "num_markers": 225,
+  "train_total": 2000,
+  "test_total": 400,
+  "classes": [
+    "no_contact",
+    "contact"
+  ],
+  "description": "Synthetic TacTip-style tactile sensor marker images"
+}
