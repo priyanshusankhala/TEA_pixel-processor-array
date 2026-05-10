@@ -1,0 +1,9 @@
+{
+  "float32_accuracy": 99.75,
+  "ternary_pc_accuracy": 50.0,
+  "scamp_simulated_accuracy": 50.0,
+  "scamp_ops_per_image": 59,
+  "scamp_estimated_fps": 169491,
+  "noise_std": 1.5,
+  "test_samples": 100
+}

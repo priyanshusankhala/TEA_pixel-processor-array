@@ -1,0 +1,40 @@
+Step 1: Download Tactile Gym (easiest, has labels, simulated)
+          pip install tactile-gym // requires pybullet -  heavy physics engine to run
+          alternative: thru simulation create synthetic TacTip style marker images
+           to faster results and less compute heavy work
+
+Step 2: Generate 256×256 grayscale images of TacTip markers
+          - Class 0: No contact (markers at rest positions) - 1200 nos
+          - Class 1: Contact (markers displaced) - 1200nos
+          split 2000 (training) + 400(test)
+
+
+Step 3: Build baseline CNN on PC
+          - Simple 3-layer CNN (matches what SCAMP can run)
+          - Report accuracy (expect 95%+ for binary classification)
+
+Step 4: Quantize to binary/ternary weights
+          - Replace float weights with {-1, 0, +1}
+          - Re-evaluate accuracy (expect 85-92%)
+          Takes the trained model with 32-bit floating point weights
+            Converts weights to binary {-1, +1}, ternary {-1, 0, +1}, 2-bit, and 3-bit versions
+            Tests each version's accuracy
+            Reports how much accuracy we lose from simplifying
+
+Step 5: Map to SCAMP-5 simulator
+          - Same architecture but using shift-and-add operations
+          - Compare accuracy: PC float vs PC quantized vs SCAMP sim
+            On the real chip, each pixel has 7 tiny capacitors that store analog voltages. 
+            In our simulator, these are numpy arrays with added noise.
+
+            Real analog registers are imperfect — every time you read or write,
+            there's a tiny random error. We simulate this by adding Gaussian noise 
+            to every operation.
+
+Step 6: Next tasks    
+            Your Python simulator tells you "this network architecture + 
+            these ternary weights = 88% accuracy"
+            You translate the same operations to SCAMP5d C++ (the operations map 1:1)
+            You run on real hardware and compare
+
+

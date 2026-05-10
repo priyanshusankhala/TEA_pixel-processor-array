@@ -1,0 +1,139 @@
+1st run
+
+============================================================
+TACTILE MARKER TRACKING — FULL PIPELINE
+============================================================
+
+
+============================================================
+  Step 1: Generate Dataset
+============================================================
+
+==================================================
+Generating Synthetic TacTip Marker Dataset
+==================================================
+  Image size: 256x256
+  Marker grid spacing: 16px
+  Train: 2000 images (1000 per class)
+  Test: 400 images (200 per class)
+
+Generating training data...
+  200/1000 pairs done
+  400/1000 pairs done
+  600/1000 pairs done
+  800/1000 pairs done
+  1000/1000 pairs done
+Generating test data...
+
+Dataset generated successfully!
+  Location: /Users/priyanshu/Documents/code/TEA/TEA_pixel-processor-array/dataset/
+  Markers per image: 225
+  Total images: 2400
+
+Next: python3 train_cnn.py
+
+============================================================
+  Step 2: Train Baseline CNN
+============================================================
+
+==================================================
+Training Baseline CNN (Float32)
+==================================================
+
+  Train samples: 2000
+  Test samples: 400
+
+  Device: mps
+  Parameters: 6,066
+  Architecture: Conv3x3(1→8) → Conv3x3(8→16) → Conv3x3(16→32) → GAP → FC(2)
+
+  Epoch  1/25 | Loss: 0.6633 | Test Acc: 88.8%
+  Epoch  5/25 | Loss: 0.1970 | Test Acc: 99.2%
+  Epoch 10/25 | Loss: 0.0789 | Test Acc: 99.5%
+  Epoch 15/25 | Loss: 0.0578 | Test Acc: 99.5%
+  Epoch 20/25 | Loss: 0.0447 | Test Acc: 99.5%
+  Epoch 25/25 | Loss: 0.0352 | Test Acc: 99.8%
+
+  BEST TEST ACCURACY: 99.8%
+  Model saved: model_float32.pth
+
+Next: python3 quantize_model.py
+
+============================================================
+  Step 3: Quantize Model
+============================================================
+
+==================================================
+Model Quantization: Binary / Ternary / 2-bit / 3-bit
+==================================================
+
+  Device: mps
+  Loaded: model_float32.pth
+
+  Float32 baseline accuracy: 99.8%
+  After BN folding accuracy: 99.8%  (should be ~same)
+
+  Quantization Results:
+  ---------------------------------------------
+  Method       Accuracy     Drop       Bits/Weight
+  ---------------------------------------------
+  Float32      99.8         ---        32
+  binary       50.0         49.8       1
+  ternary      50.0         49.8       1.6
+  2bit         50.0         49.8       2
+  3bit         50.0         49.8       3
+  ---------------------------------------------
+
+  Results saved: results_quantization.json
+
+  Key Takeaway for SCAMP-5:
+    Ternary (50.0%) uses only {-1, 0, +1}
+    → No multiplication needed! Only add/subtract/skip
+    → Directly implementable on SCAMP-5 ALU
+
+Next: python3 scamp_simulator.py
+
+============================================================
+  Step 4: SCAMP-5 Simulation
+============================================================
+
+==================================================
+SCAMP-5 Simulator: Ternary CNN Inference
+==================================================
+
+  Loaded: model_ternary.pth
+  Extracted kernels: ['conv1', 'conv2', 'conv3']
+
+  Test images: 100
+
+  Running SCAMP-5 simulation...
+    20/100 processed... (running acc: 0.0%)
+    40/100 processed... (running acc: 0.0%)
+    60/100 processed... (running acc: 16.7%)
+    80/100 processed... (running acc: 37.5%)
+    100/100 processed... (running acc: 50.0%)
+
+  ========================================
+  FINAL RESULTS COMPARISON
+  ========================================
+  Method                    Accuracy     Hardware
+  --------------------------------------------------
+  PC Float32 CNN            99.8         GPU/CPU
+  PC Ternary CNN            50.0         CPU
+  SCAMP-5 Simulated         50.0         PPA (256x256)
+  --------------------------------------------------
+
+  SCAMP-5 ops per image: ~59
+  At 10MHz clock: ~0.01 ms per inference
+  Theoretical FPS: ~169492
+
+  Note: SCAMP accuracy is lower due to:
+    - Analog register noise (simulated)
+    - 8-bit saturation
+    - Simplified single-channel processing
+    - Only first output channel used per layer
+  Saved: results_final.json
+
+============================================================
+ALL STEPS COMPLETE
+============================================================

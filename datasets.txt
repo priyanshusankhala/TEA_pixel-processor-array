@@ -1,0 +1,53 @@
+1. GelSight Marker Tracking Dataset (MIT)
+Link: https://github.com/GelSight/tracking
+What it is: Original GelSight sensor data with dense dot marker arrays. Includes sequential frames of markers being displaced by contact.
+Why it works for your project:
+Clear circular markers on flat background → perfect for edge detection on SCAMP
+Provides marker displacement ground truth
+Images are grayscale-friendly (markers are dark dots on light surface)
+Resolution can be downsampled to 256×256
+Format: Image sequences (PNG/JPG) with marker position annotations
+
+2. Tactile Gym (University of Bristol)
+Link: https://github.com/ac-93/tactile_gym
+What it is: Simulated tactile sensor data for TacTip, DIGIT, and DigiTac sensors. Includes simulated marker/pin images with labels.
+Why it works for your project:
+Simulated data = perfect for proof-of-concept (no hardware needed)
+TacTip data has clear pin markers (white dots on black background) — trivial to threshold
+Comes with touch/no-touch labels already
+Multiple object shapes → tests generalization
+Can generate unlimited training data
+Format: RGB/grayscale images + contact labels + force data
+
+3. YCB-Slide Dataset (CMU Robotics)
+Link: https://github.com/rpl-cmu/ycb-slide
+What it is: GelSlim tactile sensor data of objects sliding across the sensor surface. Has marker dot tracking throughout sliding motions.
+Why it works for your project:
+Contains frame sequences with continuous marker displacement
+Markers are clearly visible dots (easy segmentation)
+Ground truth marker positions provided per frame
+Sliding = continuous motion → tests temporal tracking
+Directly relevant to "marker tracking" accuracy metrics
+Format: Image sequences + marker position CSV + contact force data
+
+4. GelSight Mini / GelSight Wedge Datasets
+Link: https://github.com/gelsight-lab/gsrobotics
+Additional: https://github.com/MCubelab/gelsight_wedge
+What it is: Datasets from GelSight Mini and Wedge sensors (newer, compact versions). Dense marker grids with various objects pressing on the sensor.
+Why it works for your project:
+Dense regular grid of markers → very structured, easy to model
+Clear binary pattern (marker vs background) → works with binary weights
+Multiple contact scenarios: single point, edge, flat surface
+Some datasets include "no contact" baseline frames for classification
+Format: PNG images (640×480, downsample to 256×256) + depth maps
+
+5. DIGIT Sensor Dataset (Meta AI / Facebook Research)
+Link: https://github.com/facebookresearch/digit-design
+Additional data: https://github.com/suddhu/tacto (TACTO simulator for DIGIT)
+What it is: DIGIT is a compact, low-cost GelSight-type sensor. The TACTO simulator can generate synthetic DIGIT images with marker patterns.
+Why it works for your project:
+TACTO simulator → generate exactly the data you need (touch/no-touch pairs)
+Can simulate markers at any resolution including 256×256
+Labels are automatic (simulator knows contact state)
+Published benchmarks exist → compare your accuracy numbers
+Format: Simulated RGB images + contact masks + force vectors
